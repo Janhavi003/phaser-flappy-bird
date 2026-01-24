@@ -1,35 +1,27 @@
-import { GRAVITY, FLAP_VELOCITY, BIRD_SCALE } from '../utils/constants.js'
+import { BIRD_JUMP_FORCE } from '../utils/constants.js';
 
-export default class Bird extends Phaser.Physics.Arcade.Sprite {
-  constructor(scene, x, y) {
-    super(scene, x, y, 'bird')
+export default class Bird {
+    constructor(scene, x, y) {
+        this.scene = scene;
 
-    scene.add.existing(this)
-    scene.physics.add.existing(this)
+        this.sprite = scene.physics.add.sprite(x, y, 'bird');
+        this.sprite.setScale(0.25);
+        this.sprite.setCollideWorldBounds(false);
 
-    this.setScale(BIRD_SCALE)
-    this.setGravityY(GRAVITY)
-    this.setCollideWorldBounds(true)
-
-    // Fair hitbox
-    this.body.setSize(this.width * 0.6, this.height * 0.6)
-    this.body.setOffset(this.width * 0.2, this.height * 0.2)
-  }
-
-  flap() {
-    this.setVelocityY(FLAP_VELOCITY)
-    this.setAngle(-15)
-  }
-
-  update() {
-    if (this.body.velocity.y > 0) {
-      this.setAngle(20)
+        // VERY IMPORTANT
+        this.sprite.body.setGravityY(0); // world gravity applies
     }
 
-    this.body.velocity.y = Phaser.Math.Clamp(
-      this.body.velocity.y,
-      -450,
-      600
-    )
-  }
+    jump() {
+        this.sprite.setVelocityY(BIRD_JUMP_FORCE);
+        this.sprite.setAngle(-20);
+        this.scene.sound.play('flap');
+    }
+
+    update() {
+        
+        if (this.sprite.angle < 90) {
+            this.sprite.angle += 2;
+        }
+    }
 }
